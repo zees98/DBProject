@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'widgets/animatedwave.dart';
+
 class Registration extends StatefulWidget {
   @override
   _RegistrationState createState() => _RegistrationState();
@@ -15,10 +17,23 @@ class _RegistrationState extends State<Registration> {
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
+         
           Image.asset(
             'assets/gBG1.jpg',
             fit: BoxFit.fill,
           ),
+           RotatedBox(
+             quarterTurns: 4,
+                        child: Align(
+               alignment: AlignmentDirectional.bottomCenter,
+                          child: AnimatedWave(
+        height: 200,
+                color: Colors.amber,
+                speed: 2,
+                offset: 3,
+          ),
+             ),
+           ),
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Align(
