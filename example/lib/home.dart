@@ -2,9 +2,18 @@ import 'dart:async';
 
 import 'package:example_flutter/Theme/theme.dart';
 import 'package:example_flutter/about.dart';
+import 'package:example_flutter/constants/colors.dart';
 import 'package:example_flutter/database.dart';
 import 'package:example_flutter/login.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mysql1/mysql1.dart' as mysql;
+
+class Filters {
+  static double start = 500;
+  static double end = 4000;
+  static String manufacturer = 'Fender';
+}
 
 class Home extends StatefulWidget {
   @override
@@ -14,6 +23,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int pageIndex = 0;
   bool val = false;
+
   PageController pageController;
   Timer timer;
   Map<String, String> instruments = {
@@ -33,6 +43,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     // TODO: implement initState
+    Database.manufacturers();
 
     super.initState();
     pageController = PageController();
@@ -48,6 +59,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final borderRadius2 = BorderRadius.circular(10);
     return Scaffold(
       backgroundColor: val ? Colors.white : Colors.black,
       appBar: buildAppBar(),
@@ -57,6 +69,7 @@ class _HomeState extends State<Home> {
           Container(
             child: SingleChildScrollView(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Container(
                     height: 450,
@@ -87,50 +100,50 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   Container(
-                    
-                    child: ListView(
-                      
-                      shrinkWrap: true,
-                      children: <Widget>[
-                        Container(
-                          height: 220,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            //mainAxisSize: MainAxisSize.min,
-                            children: instruments.keys.map((f) {
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: FlatButton(
-                                  onPressed: () {},
-                                  color: ThemeData.dark().scaffoldBackgroundColor,
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(color: Colors.white, width: 2),
-                                      borderRadius: BorderRadius.circular(20)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Center(
-                                            child: Image.asset(
-                                          'assets/${instruments[f]}',
-                                          height: 150,
-                                          fit: BoxFit.fill,
-                                        )),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(f),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Container(
+                            height: 300,
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              //mainAxisSize: MainAxisSize.min,
+                              children: [
+                                instruments.keys.toList()[1],
+                                instruments.keys.toList()[2],
+                                instruments.keys.toList()[1],
+                                instruments.keys.toList()[2]
+                              ].map((f) {
+                                return InstrumentCard(
+                                  name: f,
+                                  price: '\$200',
+                                  image: instruments[f],
+                                );
+                              }).toList(),
+                            ),
                           ),
-                        ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Align(
+                                alignment: AlignmentDirectional.centerStart,
+                                child: Text('All Products',
+                                    style: TextStyle(fontSize: 40))),
+                          ),
+                          Container(
+                            child: Wrap(
+                              children: instruments.keys.map((f) {
+                                return InstrumentCard(
+                                  image: instruments[f],
+                                  name: f,
+                                  price: '\$300',
+                                );
+                              }).toList(),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   )
                 ],
@@ -141,34 +154,112 @@ class _HomeState extends State<Home> {
         ],
       ),
       floatingActionButton: buildFloatingActionButton(context),
+      //Drawer
       drawer: Drawer(
         child: Scaffold(
           body: Column(
             children: <Widget>[
               Image.asset('assets/gBG1.jpg'),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
+              SingleChildScrollView(
+                              child: Column(
                   children: <Widget>[
-                    CustomTabs(
-                      image: 'guitar-instrument.png',
-                      text: 'Acoustic Guitars',
-                      color: Colors.amber,
+                    
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: <Widget>[
+                          CustomTabs(
+                            image: 'guitar-instrument.png',
+                            text: 'Acoustic Guitars',
+                            color: Colors.amber,
+                          ),
+                          CustomTabs(
+                            image: 'guitar-1.png',
+                            text: 'Electric Guitars',
+                            color: Colors.red,
+                          ),
+                          CustomTabs(
+                            image: '038-amplifier.png',
+                            text: 'Amplifiers',
+                            color: Color(0xff17223b),
+                          ),
+                          CustomTabs(
+                            image: '040-piano.png',
+                            text: 'Pianos',
+                            color: Colors.black,
+                          )
+                        ],
+                      ),
                     ),
-                    CustomTabs(
-                      image: 'guitar-1.png',
-                      text: 'Electric Guitars',
-                      color: Colors.red,
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Material(
+                        clipBehavior: Clip.hardEdge,
+                        borderRadius: borderRadius2,
+                        color: Colors.black,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Align(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: Text(
+                                    'Price Filter',
+                                    textAlign: TextAlign.start,
+                                  )),
+                            ),
+                            SliderTheme(
+                              data: SliderThemeData(trackHeight: 5),
+                              child: RangeSlider(
+                                activeColor: Colors.amber,
+                                labels: RangeLabels(
+                                    Filters.start.toString(), Filters.end.toString()),
+                                values: RangeValues(Filters.start, Filters.end),
+                                min: 0,
+                                max: 40000,
+                                onChanged: (val) {
+                                  setState(() {
+                                    Filters.start = val.start;
+                                    Filters.end = val.end;
+                                  });
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                     ),
-                    CustomTabs(
-                      image: '038-amplifier.png',
-                      text: 'Amplifiers',
-                      color: Color(0xff17223b),
-                    ),
-                    CustomTabs(
-                      image: '040-piano.png',
-                      text: 'Pianos',
-                      color: Colors.black,
+                    //Future Builder
+                    Column(
+                      children: <Widget>[
+                        Text('Manufacturer'),
+                        FutureBuilder(
+                          future: Database.manufacturers(),
+                          builder: (context, snapshot) {
+                            if( snapshot.connectionState == ConnectionState.done && snapshot.hasData)
+                                { 
+                                  mysql.Results res = snapshot.data;
+                                  // res.forEach((f){
+                                  //   print(f);
+                                  // });
+                                  return DropdownButton(
+                                   
+                                    onChanged: (val){},
+                                    value: 'Fender',
+                                    items: res.map((f) {
+                                      return DropdownMenuItem<String>(
+                                        value: f[0].toString(),
+                                        child: Text(f[0].toString()),
+                                      );
+                                    }).toList(),
+                                  );
+                                }
+                                else 
+                                return CircularProgressIndicator();
+                          },
+                        )
+                      ],
                     )
                   ],
                 ),
@@ -259,6 +350,72 @@ class _HomeState extends State<Home> {
             style: TextStyle(fontFamily: "Kaushan", color: Colors.blueGrey),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class InstrumentCard extends StatelessWidget {
+  const InstrumentCard({
+    Key key,
+    @required this.name,
+    @required this.price,
+    this.image,
+    this.onPressed,
+  }) : super(key: key);
+
+  final name, price, image, onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        height: 300,
+        width: 300,
+        child: FlatButton(
+          clipBehavior: Clip.hardEdge,
+          padding: EdgeInsets.all(0),
+          onPressed: onPressed,
+          color: ThemeData.dark().scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(
+              side: BorderSide(color: Colors.white, width: 2),
+              borderRadius: BorderRadius.circular(20)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Expanded(
+                flex: 3,
+                child: Center(
+                    child: Image.asset(
+                  'assets/$image',
+                  height: 150,
+                  fit: BoxFit.fitHeight,
+                )),
+              ),
+              Expanded(
+                child: Container(
+                  color:
+                      CardColors.colors[name.length % CardColors.colors.length],
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      dense: false,
+                      // leading: Icon(FontAwesomeIcons.guitar),
+                      title: Text(name),
+                      subtitle: Text(price),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[Icon(FontAwesomeIcons.shoppingCart)],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }

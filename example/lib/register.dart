@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:example_flutter/database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mysql1/mysql1.dart' as mysql;
 
 import 'widgets/animatedwave.dart';
 
@@ -14,6 +16,7 @@ class Registration extends StatefulWidget {
 
 class _RegistrationState extends State<Registration> {
   File file = File('assets/me.jpg');
+  
   Map<String, String> _details = {
       'Name': 'Name',
       'Email': 'Email',
@@ -26,6 +29,12 @@ class _RegistrationState extends State<Registration> {
       'Gender' : 'Male',
 
     };
+    @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    
+   }
   @override
   Widget build(BuildContext context) {
     // final selection = [false, false];
@@ -68,6 +77,7 @@ class _RegistrationState extends State<Registration> {
                                 field: 'Email',
                                 icon: Icons.email),
                             RegField(
+                              showpw: true,
                               onChanged: (val) {
                                 _details['Password'] = val;
                               },
@@ -151,27 +161,22 @@ class _RegistrationState extends State<Registration> {
                                   ],
                                 ),
                                 //Country
-                                DropdownButton(
-                                  underline: Container(),
-                                  hint: Text('Country'),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _details['Country'] = value;
-                                      printAll(_details);
-                                    });
-                                  },
-                                  value: _details['Country'],
-                                  items: [
-                                    DropdownMenuItem(
-                                      value: 'Pakistan',
-                                      child: Text('Pakistan'),
-                                    ),
-                                    // DropdownMenuItem(
-                                    //   value: 'Lahore',
-                                    //   child: Text('Lahore'),
-                                    // )
-                                  ],
-                                ),
+                                // FutureBuilder(
+                                //   future: Database.readCountries(),
+                                //   builder: (context,  snapshot) {
+                                //     if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
+                                //       mysql.Results res = await snapshot;
+                                //       return DropdownButton(
+                                //       value: _details['country'],
+                                //       items: snapshot.data,
+                                //     );
+                                //     }
+                                //     else 
+                                //       return Container();
+                                  
+                                    
+                                //   },
+                                // )
                               ],
                             ),
                             RegField(
@@ -182,7 +187,9 @@ class _RegistrationState extends State<Registration> {
                               },
                             ),
                             FlatButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Database.register(_details);
+                              },
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(color: Colors.white),
                                   borderRadius: BorderRadius.circular(20)),
@@ -201,7 +208,9 @@ class _RegistrationState extends State<Registration> {
                             child: Image.asset(file.path, height: 200,)),
                          Positioned(
                             top : 150,
-                            child: FloatingActionButton(child: Icon(FontAwesomeIcons.upload),))
+                            child: FloatingActionButton(
+                              heroTag: 'f1',
+                              child: Icon(FontAwesomeIcons.upload),))
                         ],
                       )
                     ],
@@ -228,12 +237,14 @@ class RegField extends StatelessWidget {
     Key key,
     @required this.onChanged,
     @required this.field,
-    this.icon,
+    this.icon, this.showpw,
+    
+    
   }) : super(key: key);
 
   final Function onChanged;
   final String field;
-  final icon;
+  final icon, showpw;
 
   @override
   Widget build(BuildContext context) {
@@ -242,6 +253,7 @@ class RegField extends StatelessWidget {
       child: SizedBox(
         width: 450,
               child: TextFormField(
+                obscureText: showpw == null? false : showpw,
           onChanged: onChanged,
           decoration: InputDecoration(
               suffixIcon: Icon(icon),
