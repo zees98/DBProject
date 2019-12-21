@@ -1,23 +1,26 @@
 import 'dart:io';
 
+
 import 'package:mysql1/mysql1.dart';
 
-class Database{
- static MySqlConnection conn;
- static void buildConnection() async{
-   final setting = ConnectionSettings(
-     db: 'project',
-     host: 'localhost',
-     port: 3308,
-     user: 'root'
-   );
-   conn= await MySqlConnection.connect(setting);
-   //var results = await conn.query('insert into customer (id,name, image) values (null , ?, ?);', ['Zeeshan Ali', File('assets/me1.jpg')]);
-   
- }
- static dynamic getCustomer() async{
+class Database {
+  static MySqlConnection conn;
+  static void buildConnection() async {
+    final setting = ConnectionSettings(
+        db: 'project', host: 'localhost', port: 3308, user: 'root');
+    conn = await MySqlConnection.connect(setting);
+    //var results = await conn.query('insert into customer (id,name, image) values (null , ?, ?);', ['Zeeshan Ali', File('assets/me1.jpg')]);
+  }
 
-   var result = await conn.query('select image where id = ?;', ['6']);
-   return result.first[0];
- }
+  static dynamic getCustomer() async {
+    var result = await conn.query('select image where id = ?;', ['6']);
+    return result.first[0];
+  }
+
+  static Future<Results> login({String email, String password}) async{
+    var results = await conn.query(
+        'select email,pass from customers where email = ? and pass = ?',
+        [email, password]);
+        return results;
+  }
 }

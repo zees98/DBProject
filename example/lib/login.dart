@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:example_flutter/database.dart';
 import 'package:example_flutter/home.dart';
 import 'package:example_flutter/register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -14,7 +18,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   int pageIndex = 0;
   PageController pageController;
+  bool spin = false;
   Timer timer;
+  String _email, _password;
   @override
   void initState() {
     super.initState();
@@ -22,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       timer = Timer.periodic(Duration(seconds: 2), (timer) {
         pageIndex = ++pageIndex % 5;
-        
+
         pageController.animateToPage(pageIndex,
             duration: Duration(milliseconds: 800), curve: Curves.decelerate);
       });
@@ -87,18 +93,24 @@ class _LoginScreenState extends State<LoginScreen> {
                         Column(
                           children: <Widget>[
                             CustomTextFIeld(
-                              text: 'Enter Username or Email',
+                              isPassword: false,
+                              text: 'Enter Email',
                               icon: CupertinoIcons.person,
-                              onChanged: (val) {},
-                              //TODO: Add Email Val
+                              onChanged: (val) {
+                                _email = val;
+                              },
                             ),
                             SizedBox(
                               height: 50,
                             ),
                             CustomTextFIeld(
+                              isPassword: true,
+
                               text: 'Password',
                               icon: Icons.lock,
-                              onChanged: (val) {},
+                              onChanged: (val) {
+                                _password = val;
+                              },
                               //TODO: Add Password Val
                             )
                           ],
@@ -115,11 +127,45 @@ class _LoginScreenState extends State<LoginScreen> {
                               text: "Let's go",
                               color: Colors.amber,
                               icon: Icons.lock_open,
-                              onPressed: () => Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) {
-                                timer.cancel();
-                                return Home();
-                              })),
+                              onPressed: () async {
+                                var result = await Database.login(
+                                    email: _email, password: _password);
+                                
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      bool isUser = result.length > 0;
+                                      return CupertinoAlertDialog(
+                                        title: Text(
+                                          isUser ? "Success" : "Error",
+                                          style: TextStyle(
+                                              color: isUser
+                                                  ? Colors.blue
+                                                  : Colors.red),
+                                        ),
+                                        actions: <Widget>[
+                                          CupertinoButton(
+                                            child: Text(
+                                                isUser ? "OK" : "Try Again"),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              if (isUser)
+                                                Navigator.push(context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) {
+                                                  timer.cancel();
+                                                  return Home(
+                                                      );
+                                                }));
+                                            },
+                                          )
+                                        ],
+                                        content: Text(isUser
+                                            ? "Login Succesful"
+                                            : "User Not Found"),
+                                      );
+                                    });
+                              },
                             ),
                             CustomButton(
                               textStyle: textStyle,
@@ -127,7 +173,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.purple,
                               icon: Icons.email,
                               onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context){
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) {
                                   return Registration();
                                 }));
                               },
@@ -217,21 +264,26 @@ class CustomButton extends StatelessWidget {
 }
 
 class CustomTextFIeld extends StatelessWidget {
-  final icon, text, onChanged;
+  final icon, text, onChanged, suffixIcon, isPassword;
+
   const CustomTextFIeld({
     Key key,
     this.icon,
     this.text,
     this.onChanged,
+    this.suffixIcon,
+    this.isPassword,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var showPW = false;
     return Container(
       width: 400,
       child: TextField(
-        onChanged: onChanged,
-        decoration: InputDecoration(
+          obscureText: showPW,
+          onChanged: onChanged,
+          decoration: InputDecoration(
             hintText: text,
             hintStyle: TextStyle(color: Colors.black),
             filled: true,
@@ -243,8 +295,16 @@ class CustomTextFIeld extends StatelessWidget {
             prefixIcon: Icon(
               icon,
               color: Colors.black,
-            )),
-      ),
+            ),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(FontAwesomeIcons.eye),
+                    onPressed: () {
+                      showPW = !showPW;
+                    },
+                  )
+                : null,
+          )),
     );
   }
 }

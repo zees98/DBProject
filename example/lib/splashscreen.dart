@@ -26,17 +26,26 @@ class _SplashScreenState extends State<SplashScreen>
           context: context,
           builder: (context) {
             return SimpleDialog(
+              backgroundColor: Colors.black,
               children: <Widget>[
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    CustomButtons(text: 'Customer Login', img: 'man.png',color: Colors.red, onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (context){
-                          return LoginScreen();
-                        }
-                      ));
-                    }),
-                    CustomButtons(text: 'Manager', img: 'manager.png', color: Colors.primaries[3], onPressed: (){}),
+                    CustomButtons(
+                        text: 'Customer Login',
+                        img: 'man.png',
+                        color: Color(0xff55115E),
+                        onPressed: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return LoginScreen();
+                          }));
+                        }),
+                    CustomButtons(
+                        text: 'Manager',
+                        img: 'manager.png',
+                        color: Color(0xff331103),
+                        onPressed: () {}),
                   ],
                 )
               ],
@@ -119,9 +128,9 @@ class _SplashScreenState extends State<SplashScreen>
 
 class CustomButtons extends StatelessWidget {
   final text, img, onPressed, color;
-  const CustomButtons({
-    Key key, this.text, this.img, this.onPressed, this.color
-  }) : super(key: key);
+  const CustomButtons(
+      {Key key, this.text, this.img, this.onPressed, this.color})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -129,17 +138,19 @@ class CustomButtons extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: FlatButton(
         onPressed: onPressed,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         color: color,
-        child: Column(
-          children: <Widget>[
-            Image.asset('assets/icon/$img'),
-            SizedBox(
-              height: 20,
-            ),
-            Text(text)
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: <Widget>[
+              Image.asset('assets/icon/$img', height: 250,),
+              SizedBox(
+                height: 20,
+              ),
+              Text(text)
+            ],
+          ),
         ),
       ),
     );
