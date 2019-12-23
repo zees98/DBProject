@@ -168,11 +168,11 @@ class _HomeState extends State<Home> {
       //Drawer
       drawer: Drawer(
         child: Scaffold(
-          body: Column(
-            children: <Widget>[
-              Image.asset('assets/gBG1.jpg'),
-              SingleChildScrollView(
-                child: Column(
+          body: SingleChildScrollView(
+                      child: Column(
+              children: <Widget>[
+                Image.asset('assets/gBG1.jpg'),
+                Column(
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -242,6 +242,7 @@ class _HomeState extends State<Home> {
                     ),
                     //Future Builder
                     FutureBuilder(
+                      
                       future: Database.manufacturers(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.done &&
@@ -272,8 +273,8 @@ class _HomeState extends State<Home> {
                     )
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           bottomNavigationBar: MaterialButton(
             color: Colors.blueGrey,
