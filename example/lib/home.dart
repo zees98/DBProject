@@ -6,6 +6,7 @@ import 'package:example_flutter/constants/colors.dart';
 import 'package:example_flutter/database.dart';
 import 'package:example_flutter/login.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mysql1/mysql1.dart' as mysql;
 
@@ -132,14 +133,24 @@ class _HomeState extends State<Home> {
                                     style: TextStyle(fontSize: 40))),
                           ),
                           Container(
-                            child: Wrap(
-                              children: instruments.keys.map((f) {
-                                return InstrumentCard(
-                                  image: instruments[f],
-                                  name: f,
-                                  price: '\$300',
-                                );
-                              }).toList(),
+                            child: FutureBuilder(
+                              future: Database.getGuitars(),
+                              builder: (context, snap){
+                                if(snap.connectionState == ConnectionState.done){
+                                  mysql.Results res = snap.data;
+                                  return Wrap(
+                                children: res.map((f) {
+                                  return InstrumentCard(
+                                    image: f[9],
+                                    name: f[13].toString() + f[6].toString() + f[7].toString(),
+                                    price: '\$${f[8].toString()}',
+                                  );
+                                }).toList(),
+                              ); 
+                            }
+                              else 
+                                return SpinKitThreeBounce(color: Colors.blue,);
+                              },
                             ),
                           )
                         ],
@@ -161,9 +172,8 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               Image.asset('assets/gBG1.jpg'),
               SingleChildScrollView(
-                              child: Column(
+                child: Column(
                   children: <Widget>[
-                    
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
@@ -213,8 +223,8 @@ class _HomeState extends State<Home> {
                               data: SliderThemeData(trackHeight: 5),
                               child: RangeSlider(
                                 activeColor: Colors.amber,
-                                labels: RangeLabels(
-                                    Filters.start.toString(), Filters.end.toString()),
+                                labels: RangeLabels(Filters.start.toString(),
+                                    Filters.end.toString()),
                                 values: RangeValues(Filters.start, Filters.end),
                                 min: 0,
                                 max: 40000,
@@ -231,35 +241,34 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     //Future Builder
-                    Column(
-                      children: <Widget>[
-                        Text('Manufacturer'),
-                        FutureBuilder(
-                          future: Database.manufacturers(),
-                          builder: (context, snapshot) {
-                            if( snapshot.connectionState == ConnectionState.done && snapshot.hasData)
-                                { 
-                                  mysql.Results res = snapshot.data;
-                                  // res.forEach((f){
-                                  //   print(f);
-                                  // });
-                                  return DropdownButton(
-                                   
-                                    onChanged: (val){},
-                                    value: 'Fender',
-                                    items: res.map((f) {
-                                      return DropdownMenuItem<String>(
-                                        value: f[0].toString(),
-                                        child: Text(f[0].toString()),
-                                      );
-                                    }).toList(),
-                                  );
-                                }
-                                else 
-                                return CircularProgressIndicator();
-                          },
-                        )
-                      ],
+                    FutureBuilder(
+                      future: Database.manufacturers(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done &&
+                            snapshot.hasData) {
+                          mysql.Results res = snapshot.data;
+                          // res.forEach((f){
+                          //   print(f);
+                          // });
+                          return Container(
+                            color: Colors.red,
+                            child: ExpansionTile(
+                              backgroundColor: Colors.black,
+                              leading: Container(
+                                width: 10,
+                              ),
+                              title: Text('Manufacturers'),
+                              children: res.map((f) {
+                                return FlatButton(
+                                  onPressed: () {},
+                                  child: Text(f[0].toString()),
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        } else
+                          return CircularProgressIndicator();
+                      },
                     )
                   ],
                 ),

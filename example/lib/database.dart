@@ -45,11 +45,18 @@ class Database {
     //     );
   }
 
+
+  //Query
   static Future<Results> manufacturers() async {
     QueryResults.manufacturers = await conn.query('select name from manufacturers;', []);
     return QueryResults.manufacturers;
     QueryResults.manufacturers.forEach((f){
       print(f);
     });
+  }
+
+  static Future<Results> getGuitars() async{
+    var results = await conn.query('select * from guitar , instrument, manufacturers where guitar.instrumentID = instrument.instrumentID and instrument.manufacturerID = manufacturers.id;', []);
+    return results;
   }
 }

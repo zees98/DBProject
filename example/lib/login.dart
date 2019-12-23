@@ -128,43 +128,61 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.amber,
                               icon: Icons.lock_open,
                               onPressed: () async {
-                                var result = await Database.login(
-                                    email: _email, password: _password);
-                                
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      bool isUser = result.length > 0;
-                                      return CupertinoAlertDialog(
-                                        title: Text(
-                                          isUser ? "Success" : "Error",
-                                          style: TextStyle(
-                                              color: isUser
-                                                  ? Colors.blue
-                                                  : Colors.red),
-                                        ),
-                                        actions: <Widget>[
-                                          CupertinoButton(
-                                            child: Text(
-                                                isUser ? "OK" : "Try Again"),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              if (isUser)
-                                                Navigator.push(context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) {
-                                                  timer.cancel();
-                                                  return Home(
-                                                      );
-                                                }));
-                                            },
-                                          )
-                                        ],
-                                        content: Text(isUser
-                                            ? "Login Succesful"
-                                            : "User Not Found"),
-                                      );
-                                    });
+                                var result;
+                                try {
+                                  result = await Database.login(
+                                      email: _email, password: _password);
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        bool isUser = result.length > 0;
+                                        return CupertinoAlertDialog(
+                                          title: Text(
+                                            isUser ? "Success" : "Error",
+                                            style: TextStyle(
+                                                color: isUser
+                                                    ? Colors.blue
+                                                    : Colors.red),
+                                          ),
+                                          actions: <Widget>[
+                                            CupertinoButton(
+                                              child: Text(
+                                                  isUser ? "OK" : "Try Again"),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                if (isUser)
+                                                  Navigator.push(context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) {
+                                                    timer.cancel();
+                                                    return Home();
+                                                  }));
+                                              },
+                                            )
+                                          ],
+                                          content: Text(isUser
+                                              ? "Login Succesful"
+                                              : "User Not Found"),
+                                        );
+                                      });
+                                } on NoSuchMethodError catch (e) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return SimpleDialog(
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                          title: Text('Error!'),
+                                          
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Text('Can not connect to Database.'),
+                                            )
+
+                                          ],
+                                        );
+                                      });
+                                }
                               },
                             ),
                             CustomButton(

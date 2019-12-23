@@ -30,6 +30,7 @@ flutter:
     - assets/
     - assets/icon/
     - assets/info/
+    - assets/instruments/Guitars/
   # See https://github.com/flutter/flutter/wiki/Desktop-shells#fonts
   fonts:
     - family: Roboto
