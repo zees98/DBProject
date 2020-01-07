@@ -4,7 +4,10 @@ import 'package:example_flutter/Theme/theme.dart';
 import 'package:example_flutter/about.dart';
 import 'package:example_flutter/constants/colors.dart';
 import 'package:example_flutter/database.dart';
+import 'package:example_flutter/infoScreen.dart';
 import 'package:example_flutter/login.dart';
+import 'package:example_flutter/model/user.dart';
+import 'package:example_flutter/widgets/title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -24,9 +27,10 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int pageIndex = 0;
   bool val = false;
-
+  var current = User.getUser;
   PageController pageController;
   Timer timer;
+  var results;
   Map<String, String> instruments = {
     'Acoustic Guitar': 'acoustic.png',
     'Bass Guitar': 'bass.png',
@@ -44,10 +48,11 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     // TODO: implement initState
-    Database.manufacturers();
+    
 
     super.initState();
     pageController = PageController();
+    results = Database.getInstruments();
     setState(() {
       timer = Timer.periodic(Duration(seconds: 2), (timer) {
         pageIndex = ++pageIndex % 3;
@@ -134,22 +139,33 @@ class _HomeState extends State<Home> {
                           ),
                           Container(
                             child: FutureBuilder(
-                              future: Database.getGuitars(),
-                              builder: (context, snap){
-                                if(snap.connectionState == ConnectionState.done){
+                              future: Database.getInstruments(),
+                              builder: (context, snap) {
+                                if (snap.connectionState ==
+                                    ConnectionState.done && snap.hasData) {
                                   mysql.Results res = snap.data;
                                   return Wrap(
-                                children: res.map((f) {
-                                  return InstrumentCard(
-                                    image: f[9],
-                                    name: f[13].toString() + f[6].toString() + f[7].toString(),
-                                    price: '\$${f[8].toString()}',
+                                    children: res.map((f) {
+                                      return InstrumentCard(
+                                        onPressed: () => Navigator.push(context,
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                          return InfoScreen();
+                                        })),
+                                        image: f[4],
+                                        name: f[8].toString() +
+                                            f[2].toString() +
+                                            f[1].toString(),
+                                        price: '\$${f[3].toString()}',
+                                      );
+                                    }).toList(),
                                   );
-                                }).toList(),
-                              ); 
-                            }
-                              else 
-                                return SpinKitThreeBounce(color: Colors.blue,);
+                                } else{
+                                 
+                                  return SpinKitThreeBounce(
+                                    color: Colors.blue,
+                                  );
+                                }
                               },
                             ),
                           )
@@ -169,7 +185,7 @@ class _HomeState extends State<Home> {
       drawer: Drawer(
         child: Scaffold(
           body: SingleChildScrollView(
-                      child: Column(
+            child: Column(
               children: <Widget>[
                 Image.asset('assets/gBG1.jpg'),
                 Column(
@@ -242,15 +258,12 @@ class _HomeState extends State<Home> {
                     ),
                     //Future Builder
                     FutureBuilder(
-                      
                       future: Database.manufacturers(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.done &&
                             snapshot.hasData) {
                           mysql.Results res = snapshot.data;
-                          // res.forEach((f){
-                          //   print(f);
-                          // });
+
                           return Container(
                             color: Colors.red,
                             child: ExpansionTile(
@@ -260,9 +273,35 @@ class _HomeState extends State<Home> {
                               ),
                               title: Text('Manufacturers'),
                               children: res.map((f) {
-                                return FlatButton(
-                                  onPressed: () {},
-                                  child: Text(f[0].toString()),
+                                final radius = Radius.circular(20);
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: FlatButton(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                          topRight: radius,
+                                          bottomRight: radius),
+                                    ),
+                                    onPressed: () {},
+                                    color: Colors.amber.shade700,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      //mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Text(f[0].toString()),
+                                        Material(
+                                            shape: CircleBorder(
+                                                side: BorderSide(
+                                                    color: Colors.red)),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(f[1].toString()),
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                 );
                               }).toList(),
                             ),
@@ -292,8 +331,8 @@ class _HomeState extends State<Home> {
                           onChanged: (value) {
                             print(val);
                             setState(() {
-                              CustomTheme.themdata =
-                                  value ? ThemeData.dark() : ThemeData.light();
+                              //CustomTheme.themdata =
+                              //  value ? ThemeData.dark() : ThemeData.light().copyWith(scaffoldBackgroundColor: Colors.grey.shade400);
                               val = !val;
                             });
                           },
@@ -329,8 +368,8 @@ class _HomeState extends State<Home> {
     return AppBar(
       actions: <Widget>[
         Center(
-            child: Text(
-          "Zeeshan Ali",
+            child: Text( current[1].toString()
+          ,
           textAlign: TextAlign.center,
         )),
         FlatButton(
@@ -341,26 +380,13 @@ class _HomeState extends State<Home> {
           })),
           shape: CircleBorder(side: BorderSide(color: Colors.white)),
           child: Image.asset(
-            'assets/me.jpg',
+            User.getUser[7].toString()
           ),
           clipBehavior: Clip.hardEdge,
         )
       ],
       centerTitle: true,
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(
-            "Z ",
-            style: TextStyle(
-                fontFamily: "Homemade", fontSize: 18, color: Colors.amber),
-          ),
-          Text(
-            "Music Store",
-            style: TextStyle(fontFamily: "Kaushan", color: Colors.blueGrey),
-          ),
-        ],
-      ),
+      title: TitleName(),
     );
   }
 }

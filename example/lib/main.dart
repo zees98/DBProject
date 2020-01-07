@@ -1,12 +1,13 @@
 
 import 'package:example_flutter/Theme/theme.dart';
+import 'package:example_flutter/infoScreen.dart';
 import 'package:example_flutter/login.dart';
+import 'package:example_flutter/manager/mHome.dart';
 import 'package:example_flutter/splashscreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'database.dart';
 
@@ -17,8 +18,7 @@ void main() {
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    
-    home: SplashScreen(),
+    home:SplashScreen(),
     theme: CustomTheme.themdata,
   ));
 }

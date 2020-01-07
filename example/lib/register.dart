@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'dart:ui';
-
+import 'package:flutter/widgets.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:example_flutter/database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
 import 'package:mysql1/mysql1.dart' as mysql;
 
 import 'widgets/animatedwave.dart';
@@ -16,258 +19,407 @@ class Registration extends StatefulWidget {
 
 class _RegistrationState extends State<Registration> {
   File file = File('assets/me.jpg');
-  
-  Map<String, String> _details = {
-      'Name': 'Name',
-      'Email': 'Email',
-      'Pasword': 'Password',
-      'Phone': 'Phone',
-      'DOB': 'DOB',
-      'Address': 'Address',
-      'City': 'Islamabad',
-      'Country': 'Pakistan',
-      'Gender' : 'Male',
 
-    };
-    @override
+  Map<String, String> _details = {
+    'Name': 'Name',
+    'Email': 'Email',
+    'Pasword': 'Password',
+    'Phone': 'Phone',
+    'DOB': 'DOB',
+    'Address': 'Address',
+    'City': '1',
+    'Funds': '0.0',
+    'Country': '1',
+    'Gender': 'Male',
+    'Image': 'assets/avatars/1.png'
+  };
+  var _country = 'Country', _city = 'City';
+  final boxDecoration = BoxDecoration(
+      border: Border.all(color: Colors.red, width: 2),
+      borderRadius: BorderRadius.circular(20));
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    
-   }
+  }
+
   @override
   Widget build(BuildContext context) {
     // final selection = [false, false];
-    
+
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
+      backgroundColor: Colors.black,
+      body: Row(
+        //  mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Image.asset(
-            'assets/gBG1.jpg',
-            fit: BoxFit.fill,
+          Expanded(
+            child: Container(
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('assets/guitarReg.gif'),
+                        fit: BoxFit.fitHeight)),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.center,
+                      child: Card(
+                        color: Colors.red,
+                        child: Image.asset('assets/logo.png'),
+                      ),
+                    ),
+                  ],
+                )),
           ),
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Align(
-              alignment: Alignment.center,
-              child: Container(
-                color: Colors.black54,
-                width: 700,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      SingleChildScrollView(
-                        child: Column(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 1024.5,
+              child: Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //  mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      //  crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Text('Create An Account',
+                            style: TextStyle(
+                                fontFamily: 'Kaushan', fontSize: 35)),
+                        SizedBox(
+                          height: 50,
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             RegField(
                               onChanged: (val) {
                                 _details['Name'] = val;
                               },
-                              field: 'Name',
-                              icon: Icons.person,
+                              label: 'Name',
+                              icon: Icon(Icons.person, color: Colors.red),
                             ),
                             RegField(
-                                onChanged: (val) {
-                                  _details['Email'] = val;
-                                },
-                                field: 'Email',
-                                icon: Icons.email),
+                              onChanged: (val) {
+                                _details['Email'] = val;
+                              },
+                              label: 'Email',
+                              icon: Icon(
+                                Icons.email,
+                                color: Colors.red,
+                              ),
+                            ),
                             RegField(
-                              showpw: true,
+                              hideText: true,
+                              label: 'Password',
+                              icon: Icon(Icons.lock, color: Colors.red),
                               onChanged: (val) {
                                 _details['Password'] = val;
                               },
-                              field: 'Password',
-                              icon: Icons.lock,
                             ),
+                            //DateTIme picker
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SizedBox(
+                                width: 400,
+                                child: DateTimeField(
+                                  onChanged: (val) {
+                                    _details['DOB'] = val.toString();
+                                  },
+                                  decoration: InputDecoration(
+                                    suffixIcon:
+                                        Icon(Icons.cake, color: Colors.red),
+                                    labelText: 'Enter your Birthdate',
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20),
+                                        borderSide: BorderSide(
+                                            color: Colors.red, width: 2)),
+                                  ),
+                                  format: DateFormat('yyyy-MM-dd'),
+                                  onShowPicker: (context, snap) async {
+                                    return showDatePicker(
+                                        initialDate: DateTime(2019),
+                                        context: context,
+                                        firstDate: DateTime(1950),
+                                        lastDate:
+                                            DateTime(DateTime.now().year));
+                                  },
+                                ),
+                              ),
+                            ),
+                            
+                            // RegField(
+                            //   icon: Icon(Icons.lock, color: Colors.red),
+                            //   label: 'Confirm Password',
+
+                            // ),
                             RegField(
-                              onChanged: (val){
+                              icon: Icon(
+                                Icons.phone,
+                                color: Colors.red,
+                              ),
+                              label: 'Phone',
+                              onChanged: (val) {
                                 _details['Phone'] = val;
                               },
-                              field: 'Phone',
-                              icon: Icons.phone,
-                            ),
-                            DropdownButton(
-                              // itemHeight: 20,
-                              onChanged: (value) {
-                                setState(() {
-                                  _details['Gender'] = value;
-                                   printAll(_details);
-                                });
-                              },
-                              value: _details['Gender'],
-                              items: [
-                                DropdownMenuItem(
-                                  value: 'Male',
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Text('Male'),
-                                      SizedBox(
-                                        width: 50,
-                                      ),
-                                      Icon(FontAwesomeIcons.male)
-                                    ],
-                                  ),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'Female',
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Text('Female'),
-                                      SizedBox(
-                                        width: 45,
-                                      ),
-                                      Icon(FontAwesomeIcons.female)
-                                    ],
-                                  ),
-                                )
-                              ],
                             ),
                             RegField(
-                              onChanged: (val){
+                              icon: Icon(
+                                Icons.location_city,
+                                color: Colors.red,
+                              ),
+                              label: 'Address',
+                              onChanged: (val) {
                                 _details['Address'] = val;
                               },
-                              field: 'Perm. Address',
-                              icon: Icons.location_city,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                DropdownButton(
-                                  underline: Container(),
-                                  hint: Text('City'),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _details['City']= value;
-                                       printAll(_details);
-                                    });
-                                  },
-                                  value: _details['City'],
-                                  items: [
-                                    DropdownMenuItem(
-                                      value: 'Islamabad',
-                                      child: Text('Islamabad'),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Column(
+                                      children: <Widget>[
+                                        FutureBuilder(
+                                          future: Database.readCity(
+                                              _details['Country']),
+                                          builder: (context, snap) {
+                                            if (snap.connectionState ==
+                                                ConnectionState.done && snap.hasData) {
+                                              mysql.Results res = snap.data;
+
+                                              return Container(
+                                                decoration: boxDecoration,
+                                                width: 190,
+                                                child: SingleChildScrollView(
+                                                  child: ExpansionTile(
+                                                    title: Text(_city),
+                                                    children: res.map((f) {
+                                                      return FlatButton(
+                                                        child: Text(
+                                                            f[1].toString()),
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            _city = f[1]
+                                                                .toString();
+                                                            _details[
+                                                                'City'] = f[
+                                                                    0]
+                                                                .toString();
+                                                          });
+                                                        },
+                                                      );
+                                                    }).toList(),
+                                                  ),
+                                                ),
+                                              );
+                                            } else
+                                              return SpinKitChasingDots(
+                                                duration:
+                                                    Duration(seconds: 2),
+                                                color: Colors.amber,
+                                              );
+                                          },
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        Container(
+                                          width: 190,
+                                          decoration: boxDecoration,
+                                          child: ExpansionTile(
+                                            title: Text(
+                                              _details['Gender'],
+                                            ),
+                                            leading:
+                                                Icon(FontAwesome5.meh_blank),
+                                            children: <Widget>[
+                                              IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _details['Gender'] =
+                                                        'Male';
+                                                  });
+                                                },
+                                                icon: Icon(AntDesign.man),
+                                                tooltip: 'Male',
+                                              ),
+                                              IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _details['Gender'] =
+                                                        'Female';
+                                                  });
+                                                },
+                                                icon: Icon(AntDesign.woman),
+                                                tooltip: 'Female',
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                    DropdownMenuItem(
-                                      value: 'Lahore',
-                                      child: Text('Lahore'),
-                                    )
-                                  ],
-                                ),
-                                //Country
-                                // FutureBuilder(
-                                //   future: Database.readCountries(),
-                                //   builder: (context,  snapshot) {
-                                //     if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
-                                //       mysql.Results res = await snapshot;
-                                //       return DropdownButton(
-                                //       value: _details['country'],
-                                //       items: snapshot.data,
-                                //     );
-                                //     }
-                                //     else 
-                                //       return Container();
-                                  
-                                    
-                                //   },
-                                // )
-                              ],
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    FutureBuilder(
+                                      future: Database.readCountries(),
+                                      builder: (context, snap) {
+                                        if (snap.connectionState ==
+                                            ConnectionState.done && snap.hasData) {
+                                          mysql.Results res = snap.data;
+                                          return Container(
+                                            decoration: boxDecoration,
+                                            width: 190,
+                                            child: ExpansionTile(
+                                              title: Text(_country),
+                                              children: res.map((f) {
+                                                return FlatButton(
+                                                  child:
+                                                      Text(f[1].toString()),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      _city = Database.cityID;
+                                                      _country =
+                                                          f[1].toString();
+                                                      _details['Country'] =
+                                                          f[0].toString();
+                                                    });
+                                                  },
+                                                );
+                                              }).toList(),
+                                            ),
+                                          );
+                                        } else
+                                          return SpinKitChasingDots(
+                                            color: Colors.amber,
+                                          );
+                                      },
+                                    ),
+                                  ]),
                             ),
-                            RegField(
-                              field: 'Date of Birth (YYYY-MM-DD)',
-                              icon: FontAwesomeIcons.birthdayCake,
-                              onChanged: (val) {
-                                _details['DOB'] = val;
-                              },
-                            ),
-                            FlatButton(
-                              onPressed: () {
-                                Database.register(_details);
-                              },
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(color: Colors.white),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Text('Save'),
-                            )
                           ],
-                        ),
-                      ),
-                     Stack(
-                       overflow: Overflow.visible,
-                        children: <Widget>[
-                          Material(
-                            shape: CircleBorder(),
-                            borderOnForeground: true,
-                            clipBehavior: Clip.antiAlias,
-                            child: Image.asset(file.path, height: 200,)),
-                         Positioned(
-                            top : 150,
-                            child: FloatingActionButton(
-                              heroTag: 'f1',
-                              child: Icon(FontAwesomeIcons.upload),))
-                        ],
-                      )
-                    ],
-                    
+                        )
+                      ],
+                    ),
                   ),
-                ),
+                  SizedBox(
+                    height: 600,
+                    width: 500,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      // crossAxisAlignment: CrossAxisAlignment.end,
+                      // crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          height: 200,
+                          width: 200,
+                          child: Image.asset(_details['Image']),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Center(
+                          child: Container(
+                            decoration: boxDecoration,
+                            width: 250,
+                            child: ExpansionTile(
+                                initiallyExpanded: true,
+                                title: Text('Avatars'),
+                                children: [
+                                  SizedBox(
+                                    height: 250,
+                                    child: GridView.count(
+                                      crossAxisCount: 4,
+                                      children:
+                                          List.generate(10, (val) => val + 1)
+                                              .map((f) {
+                                        return FlatButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _details['Image'] =
+                                                  'assets/avatars/$f.png';
+                                            });
+                                          },
+                                          child: Image.asset(
+                                              'assets/avatars/$f.png'),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  )
+                                ]),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
               ),
             ),
-          )
+          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.arrow_back_ios),
-        onPressed: () {
-          Navigator.pop(context);
-        },
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          FloatingActionButton(
+            heroTag: 'f1',
+            tooltip: 'Register',
+            child: Icon(Icons.check),
+            onPressed: () {
+              Database.register(_details);
+              //TODO: Confirm Dialog
+            },
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          FloatingActionButton(
+            heroTag: 'f2',
+            tooltip: 'Cancel',
+            child: Icon(Icons.arrow_back_ios),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
     );
   }
 }
 
 class RegField extends StatelessWidget {
+  final label, onChanged, icon, hideText;
   const RegField({
     Key key,
-    @required this.onChanged,
-    @required this.field,
-    this.icon, this.showpw,
-    
-    
+    this.hideText,
+    this.label,
+    this.onChanged,
+    this.icon,
   }) : super(key: key);
-
-  final Function onChanged;
-  final String field;
-  final icon, showpw;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SizedBox(
-        width: 450,
-              child: TextFormField(
-                obscureText: showpw == null? false : showpw,
+        width: 400,
+        child: TextField(
+          obscureText: hideText ?? false,
           onChanged: onChanged,
+          expands: false,
           decoration: InputDecoration(
-              suffixIcon: Icon(icon),
-              labelText: field,
+              suffixIcon: icon,
+              labelText: label,
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: Colors.yellow))),
+                  borderSide: BorderSide(color: Colors.red))),
         ),
       ),
     );
   }
-}
-void printAll(Map<String,String> map){
-  map.forEach((f,v){
-    print('Key: $f Value: $v');
-  });
 }

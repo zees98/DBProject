@@ -14,8 +14,8 @@
 
 #include "window_configuration.h"
 
-const wchar_t *kFlutterWindowTitle = L"Flutter Desktop Example";
-const unsigned int kFlutterWindowOriginX = 10;
-const unsigned int kFlutterWindowOriginY = 10;
-const unsigned int kFlutterWindowWidth = 800;
-const unsigned int kFlutterWindowHeight = 600;
+const wchar_t *kFlutterWindowTitle = L"Z Music Store";
+const unsigned int kFlutterWindowOriginX = 0;
+const unsigned int kFlutterWindowOriginY = 0;
+const unsigned int kFlutterWindowWidth = 1366;
+const unsigned int kFlutterWindowHeight = 768;

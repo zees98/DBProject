@@ -1,4 +1,5 @@
 import 'package:example_flutter/login.dart';
+import 'package:example_flutter/manager/mHome.dart';
 import 'package:example_flutter/widgets/animatedwave.dart';
 import 'package:example_flutter/widgets/custombuttons.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/widgets.dart';
 import 'dart:math';
 
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+import 'manager/mLogin.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -45,7 +48,9 @@ class _SplashScreenState extends State<SplashScreen>
                         text: 'Manager',
                         img: 'manager.png',
                         color: Color(0xff331103),
-                        onPressed: () {}),
+                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context){
+                          return ManagerLogin();
+                        }))),
                   ],
                 )
               ],

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:example_flutter/database.dart';
 import 'package:example_flutter/home.dart';
+import 'package:example_flutter/model/user.dart';
 import 'package:example_flutter/register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -154,7 +155,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   Navigator.push(context,
                                                       MaterialPageRoute(
                                                           builder: (context) {
+
                                                     timer.cancel();
+                                                    User.setUser = result;
                                                     return Home();
                                                   }));
                                               },
@@ -183,8 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         );
                                       });
                                 }
-                              },
-                            ),
+                              }),
                             CustomButton(
                               textStyle: textStyle,
                               text: 'Register',
@@ -243,7 +245,8 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class CustomButton extends StatelessWidget {
-  final text, color, icon, onPressed;
+  final text, color , onPressed; 
+  final IconData icon;
   const CustomButton({
     Key key,
     @required this.textStyle,
@@ -301,7 +304,9 @@ class CustomTextFIeld extends StatelessWidget {
       child: TextField(
           obscureText: showPW,
           onChanged: onChanged,
+          
           decoration: InputDecoration(
+            
             hintText: text,
             hintStyle: TextStyle(color: Colors.black),
             filled: true,
