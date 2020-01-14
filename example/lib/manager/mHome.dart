@@ -1,4 +1,5 @@
 import 'package:example_flutter/login.dart';
+import 'package:example_flutter/model/user.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +85,7 @@ class _ManagerHomeState extends State<ManagerHome> {
                             textStyle: TextStyle(fontSize: 18),
                           ),
                         ),
-                         SizedBox(
+                        SizedBox(
                           width: 200,
                           child: CustomButton(
                             color: Colors.red.shade800,
@@ -121,7 +122,7 @@ class _ManagerHomeState extends State<ManagerHome> {
                             SizedBox(
                               height: 250,
                               width: 800,
-                              child:Wrap(
+                              child: Wrap(
                                 runSpacing: 10,
                                 children: <Widget>[
                                   TileButton(
@@ -135,7 +136,31 @@ class _ManagerHomeState extends State<ManagerHome> {
                                     ),
                                   ),
                                   TileButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.all(20.0),
+                                              child: Material(
+                                                color: Colors.black,
+                                                child: Table(
+                                                  children: [
+                                                    TableRow(
+                                                      children: [
+                                                        Text('Col 1'),
+                                                        Text('Col 2'),
+                                                        
+                                                      ]
+                                                    ),
+                                                  
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          });
+                                    },
                                     text: 'Customers',
                                     counter: 2800,
                                     icon: Icon(
@@ -148,9 +173,12 @@ class _ManagerHomeState extends State<ManagerHome> {
                                     counter: 40,
                                     onPressed: () {},
                                     text: 'Delivery Processing',
-                                    icon: Icon(FontAwesomeIcons.gift, size: 40,color: Colors.red,),
+                                    icon: Icon(
+                                      FontAwesomeIcons.gift,
+                                      size: 40,
+                                      color: Colors.red,
+                                    ),
                                   )
-                                  
                                 ],
                               ),
                             ),

@@ -1,4 +1,3 @@
-
 import 'package:example_flutter/Theme/theme.dart';
 import 'package:example_flutter/infoScreen.dart';
 import 'package:example_flutter/login.dart';
@@ -18,8 +17,7 @@ void main() {
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home:SplashScreen(),
+    home: SplashScreen(),
     theme: CustomTheme.themdata,
   ));
 }
-

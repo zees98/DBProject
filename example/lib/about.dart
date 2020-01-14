@@ -1,5 +1,11 @@
 import 'dart:io';
+import 'package:example_flutter/about/buyhistory.dart';
+import 'package:example_flutter/about/favourite.dart';
+import 'package:example_flutter/about/funds.dart';
+import 'package:example_flutter/home.dart';
+import 'package:example_flutter/updateUser.dart';
 
+import 'model/user.dart';
 import 'package:flutter/material.dart';
 
 class AboutMe extends StatefulWidget {
@@ -10,63 +16,22 @@ class AboutMe extends StatefulWidget {
 }
 
 class _AboutMeState extends State<AboutMe> {
-  Map<String, String> usr = {
-    'Name': 'Zeeshan Ali',
-    'Email': 'zeeshanhamdani98@gmail.com',
-    'Password': '12345678',
-    'Phone': '03005531902',
-    'Address': 'ABC Street',
-    'Mailing Address': 'XYZ Flat',
-  };
-  List<Widget> infoWidgets;
-
-  bool editable = false;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    infoWidgets = [
-      Icon(Icons.person),
-      Icon(Icons.email),
-      Icon(Icons.lock),
-      Icon(Icons.phone),
-      Icon(Icons.location_on),
-      Icon(Icons.location_on),
-    ];
-  }
-  
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: Colors.black,
       //FAB
-      floatingActionButton: Container(
-        height: 300,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            FloatingActionButton(
-              heroTag: 'f2',
-              child: Icon(Icons.edit),
-              onPressed: () {
-                setState(() {
-                  editable = !editable;
-                });
-              },
-            ),
-            FloatingActionButton(
-              heroTag: 'f1',
-              onPressed: () => Navigator.pop(context),
-              child: Icon(
-                Icons.arrow_back_ios,
-                color: Colors.black,
-              ),
-              backgroundColor: Colors.orange,
-            ),
-          ],
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'f1',
+        onPressed: () =>
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return Home();
+        })),
+        child: Icon(
+          Icons.arrow_back_ios,
+          color: Colors.black,
         ),
+        backgroundColor: Colors.orange,
       ),
       //BODY
       body: Column(
@@ -74,6 +39,7 @@ class _AboutMeState extends State<AboutMe> {
           buildOverHead(),
           Expanded(
             child: Stack(
+              fit: StackFit.expand,
               children: <Widget>[
                 Align(
                     alignment: AlignmentDirectional.centerEnd,
@@ -83,57 +49,82 @@ class _AboutMeState extends State<AboutMe> {
                           'assets/icon/guitar-1.png',
                           colorBlendMode: BlendMode.darken,
                         ))),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SingleChildScrollView(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.all(50.0),
+                    child: GridView.count(
+                      crossAxisCount: 5,
                       children: <Widget>[
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: usr.keys.map((f) {
-                            var index = usr.keys.toList().indexOf(f);
-                            return InfoField(
-                              editable: editable,
-                              value: usr[f],
-                              field: f,
-                              icon: infoWidgets[index.toInt()],
-                            );
-                          }).toList(),
-                        ),
-                        SizedBox(
-                          width: 200,
+                        InfoCards(
+                          color: Colors.red,
+                          text: 'Change',
+                          value: 'Profile',
+                          icon: 'man.png',
+                          onPressed: () {
+                            setState(() {
+                              showDialog(
+                                context: context,
+                                child: UpdateUser(),
+                                barrierDismissible: false,
+                              );
+                            });
+                          },
                         ),
                         //Wallet Card
-                        Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                InfoCards(
-                                  color: Colors.deepPurple,
-                                  text: 'Current Balance',
-                                  value: '\$600',
-                                  icon: 'payment.png',
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                InfoCards(
-                                  color: Colors.amber.shade800,
-                                  text: 'Total Purchases',
-                                  value: '8',
-                                  icon: 'shopping-basket.png',
-                                ),
-                              ],
-                            ),
-                            InfoCards(
-                              value: 'Verified',
-                              text: 'Status',
-                              icon: 'checkmark.png',
-                            )
-                          ],
-                        )
+                        InfoCards(
+                          onPressed: () {
+                            setState(() {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (context) {
+                                    return FundsScreen();
+                                  });
+                            });
+                          },
+                          color: Colors.deepPurple,
+                          text: 'Current Balance',
+                          value: '\$${User.getFunds}',
+                          icon: 'payment.png',
+                        ),
+                        InfoCards(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return PurchaseHistory();
+                                });
+                          },
+                          color: Colors.amber.shade800,
+                          text: 'Purchases',
+                          value: '8',
+                          icon: 'shopping-basket.png',
+                        ),
+                        InfoCards(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return FavouriteScreen();
+                                });
+                          },
+                          color: Colors.black,
+                          text: 'View',
+                          value: 'Favourites',
+                          icon: 'rating.png',
+                        ),
+                        InfoCards(
+                          color: Colors.primaries[8],
+                          text: 'Activity',
+                          value: 'Log',
+                          icon: 'checklist.png',
+                        ),
+                        InfoCards(
+                          value: 'Account',
+                          text: 'Delete',
+                          icon: 'delete-user.png',
+                        ),
                       ],
                     ),
                   ),
@@ -152,15 +143,18 @@ class _AboutMeState extends State<AboutMe> {
         ClipPath(
           clipper: WaveClipper(),
           child: Container(
-            height: 310,
-            color: Colors.red,
+            height: 300,
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [Colors.red, Colors.black.withRed(50)])),
           ),
         ),
+        //Border
         ClipPath(
           clipper: WaveClipper(),
           child: Container(
             padding: EdgeInsets.all(10),
-            height: 300,
+            height: 280,
             decoration: BoxDecoration(
                 image: DecorationImage(
                     fit: BoxFit.fill,
@@ -179,14 +173,14 @@ class _AboutMeState extends State<AboutMe> {
                     shape: CircleBorder(),
                     clipBehavior: Clip.hardEdge,
                     child: Image.asset(
-                      'assets/me.jpg',
+                      User.getAvatar,
                       height: 150,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Zeeshan Ali',
+                      User.getName,
                       style: TextStyle(fontSize: 30),
                     ),
                   )
@@ -201,39 +195,65 @@ class _AboutMeState extends State<AboutMe> {
 }
 
 class InfoCards extends StatelessWidget {
-  final text, color, icon, value;
+  final text, color, icon, value, onPressed;
   const InfoCards({
     Key key,
     this.text,
     this.color,
     this.icon,
     this.value,
+    this.onPressed,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      width: 200,
-      child: Card(
-        color: color,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SizedBox(
+        height: 200,
+        width: 200,
+        child: FlatButton(
+          padding: EdgeInsets.all(20),
+          clipBehavior: Clip.hardEdge,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                bottomRight: Radius.circular(90),
+              ),
+              side: BorderSide(color: Colors.white, width: 5)),
+          onPressed: onPressed ?? () {},
+          child: Card(
+            shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.only(bottomRight: Radius.circular(90))),
+            color: color,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Expanded(flex: 2, child: Text(text)),
-                  Expanded(child: Image.asset('assets/icon/$icon'))
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Expanded(
+                        child: Container(),
+                      ),
+                      Expanded(
+                          flex: 2,
+                          child: Text(
+                            text,
+                            textAlign: TextAlign.center,
+                          )),
+                      Expanded(child: Image.asset('assets/icon/$icon'))
+                    ],
+                  ),
+                  Text(
+                    value,
+                    style: TextStyle(fontSize: 25),
+                  )
                 ],
               ),
-              Text(
-                value,
-                style: TextStyle(fontSize: 50),
-              )
-            ],
+            ),
           ),
         ),
       ),
@@ -284,9 +304,9 @@ class WaveClipper extends CustomClipper<Path> {
 
     path.lineTo(0.0, size.height - 20);
     path.quadraticBezierTo(
-        size.width / 4, size.height, size.width / 2.25, size.height - 90);
+        size.width / 4, size.height, size.width / 2.25, size.height - 50);
 
-    path.quadraticBezierTo(size.width - (size.width / 3.25), size.height - 200,
+    path.quadraticBezierTo(size.width - (size.width / 3.25), size.height - 100,
         size.width, size.height);
     path.lineTo(size.width, size.height);
     path.lineTo(size.width, 0.0);

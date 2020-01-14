@@ -5,11 +5,14 @@ import 'package:example_flutter/database.dart';
 import 'package:example_flutter/home.dart';
 import 'package:example_flutter/model/user.dart';
 import 'package:example_flutter/register.dart';
+import 'package:example_flutter/splashscreen.dart';
+import 'package:example_flutter/widgets/floatback.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -22,6 +25,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool spin = false;
   Timer timer;
   String _email, _password;
+  
+  GlobalKey<FormState> key = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
@@ -40,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final textStyle = TextStyle(color: Colors.white, fontFamily: "Roboto");
     return Scaffold(
+      floatingActionButton: FloatBack(widget: SplashScreen(),),
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -91,30 +97,51 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-                        Column(
-                          children: <Widget>[
-                            CustomTextFIeld(
-                              isPassword: false,
-                              text: 'Enter Email',
-                              icon: CupertinoIcons.person,
-                              onChanged: (val) {
-                                _email = val;
-                              },
-                            ),
-                            SizedBox(
-                              height: 50,
-                            ),
-                            CustomTextFIeld(
-                              isPassword: true,
-
-                              text: 'Password',
-                              icon: Icons.lock,
-                              onChanged: (val) {
-                                _password = val;
-                              },
-                              //TODO: Add Password Val
-                            )
-                          ],
+                        Form(
+                          key: key,
+                          child: Column(
+                            children: <Widget>[
+                              Image.asset('assets/icon/man.png'),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              CustomTextFIeld(
+                                validator: (String val) {
+                                  if (val.contains('@') &&
+                                      (val.contains('.com') ||
+                                          val.contains('.net') ||
+                                          val.contains('.org')))
+                                    return null;
+                                  else
+                                    return 'Please Enter a valid email';
+                                },
+                                isPassword: false,
+                                text: 'Enter Email',
+                                icon: CupertinoIcons.person,
+                                onChanged: (val) {
+                                  _email = val;
+                                },
+                              ),
+                              SizedBox(
+                                height: 30,
+                              ),
+                              CustomTextFIeld(
+                                isPassword: true,
+                                validator: (String val) {
+                                  if (val.length < 6)
+                                    return 'Incomplete Password';
+                                  else
+                                    return null;
+                                },
+                                text: 'Password',
+                                icon: Icons.lock,
+                                onChanged: (val) {
+                                  _password = val;
+                                },
+                                //TODO: Add Password Val
+                              )
+                            ],
+                          ),
                         ),
                         Text(
                           'Forgot Password? Click here.',
@@ -124,69 +151,79 @@ class _LoginScreenState extends State<LoginScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
                             CustomButton(
-                              textStyle: textStyle,
-                              text: "Let's go",
-                              color: Colors.amber,
-                              icon: Icons.lock_open,
-                              onPressed: () async {
-                                var result;
-                                try {
-                                  result = await Database.login(
-                                      email: _email, password: _password);
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        bool isUser = result.length > 0;
-                                        return CupertinoAlertDialog(
-                                          title: Text(
-                                            isUser ? "Success" : "Error",
-                                            style: TextStyle(
-                                                color: isUser
-                                                    ? Colors.blue
-                                                    : Colors.red),
-                                          ),
-                                          actions: <Widget>[
-                                            CupertinoButton(
-                                              child: Text(
-                                                  isUser ? "OK" : "Try Again"),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                if (isUser)
-                                                  Navigator.push(context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) {
+                                textStyle: textStyle,
+                                text: "Let's go",
+                                color: Colors.amber,
+                                icon: Icons.lock_open,
+                                onPressed: () async {
+                                  
+                                  if (key.currentState.validate()) {
+                                   key.currentState.save();
 
-                                                    timer.cancel();
-                                                    User.setUser = result;
-                                                    return Home();
-                                                  }));
-                                              },
-                                            )
-                                          ],
-                                          content: Text(isUser
-                                              ? "Login Succesful"
-                                              : "User Not Found"),
-                                        );
-                                      });
-                                } on NoSuchMethodError catch (e) {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return SimpleDialog(
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                          title: Text('Error!'),
-                                          
-                                          children: <Widget>[
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Text('Can not connect to Database.'),
-                                            )
-
-                                          ],
-                                        );
-                                      });
-                                }
-                              }),
+                                    var result;
+                                    try {
+                                      result = await Database.login(
+                                          email: _email, password: _password);
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            bool isUser = result.length > 0;
+                                            return CupertinoAlertDialog(
+                                              title: Text(
+                                                isUser ? "Success" : "Error",
+                                                style: TextStyle(
+                                                    color: isUser
+                                                        ? Colors.blue
+                                                        : Colors.red),
+                                              ),
+                                              actions: <Widget>[
+                                                CupertinoButton(
+                                                  child: Text(isUser
+                                                      ? "OK"
+                                                      : "Try Again"),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                    if (isUser)
+                                                      Navigator.push(context,
+                                                          MaterialPageRoute(
+                                                              builder:
+                                                                  (context) {
+                                                        timer.cancel();
+                                                        User.setUser = result;
+                                                        //key.currentState.dispose();
+                                                        return Home();
+                                                      }));
+                                                  },
+                                                )
+                                              ],
+                                              content: Text(isUser
+                                                  ? "Login Succesful"
+                                                  : "User Not Found"),
+                                            );
+                                          });
+                                    } on NoSuchMethodError catch (e) {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return SimpleDialog(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10)),
+                                              title: Text('Error!'),
+                                              children: <Widget>[
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                      'Can not connect to Database.'),
+                                                )
+                                              ],
+                                            );
+                                          });
+                                    }
+                                  }
+                                }),
                             CustomButton(
                               textStyle: textStyle,
                               text: 'Register',
@@ -245,7 +282,7 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class CustomButton extends StatelessWidget {
-  final text, color , onPressed; 
+  final text, color, onPressed;
   final IconData icon;
   const CustomButton({
     Key key,
@@ -286,6 +323,7 @@ class CustomButton extends StatelessWidget {
 
 class CustomTextFIeld extends StatelessWidget {
   final icon, text, onChanged, suffixIcon, isPassword;
+  final Function validator;
 
   const CustomTextFIeld({
     Key key,
@@ -294,6 +332,7 @@ class CustomTextFIeld extends StatelessWidget {
     this.onChanged,
     this.suffixIcon,
     this.isPassword,
+    this.validator,
   }) : super(key: key);
 
   @override
@@ -301,12 +340,11 @@ class CustomTextFIeld extends StatelessWidget {
     var showPW = false;
     return Container(
       width: 400,
-      child: TextField(
+      child: TextFormField(
           obscureText: showPW,
-          onChanged: onChanged,
-          
+          onSaved: onChanged,
+          validator: validator,
           decoration: InputDecoration(
-            
             hintText: text,
             hintStyle: TextStyle(color: Colors.black),
             filled: true,
