@@ -85,7 +85,7 @@ class _InfoScreenState extends State<InfoScreen> {
                       angle: 0, //0.25 * pi,
                       child: Image.asset(
                         'assets/${widget.info[4].toString()}',
-                        height: 250,
+                        height: 400,
                       )),
                 ),
 
@@ -583,7 +583,7 @@ class _InfoScreenState extends State<InfoScreen> {
                           return Column(
                             children: res.map((f) {
                               return ListTile(
-                                leading: Image.asset(f[4].toString()),
+                                leading: Image.asset(f[3].toString()),
                                 title: Text(f[1].toString()),
                                 subtitle: RichText(
                                   text: TextSpan(children: [
@@ -591,22 +591,22 @@ class _InfoScreenState extends State<InfoScreen> {
                                     TextSpan(text: f.last.toString(), style: TextStyle(color: Colors.grey.shade800))
                                   ]),
                                 ),
-                                trailing: RatingBar(
-                                  glowColor: Colors.amber,
-                                  unratedColor: Colors.white,
-                                  itemBuilder: (context, i) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        FontAwesomeIcons.drum,
-                                        color: Colors.amber,
-                                      ),
-                                    );
-                                  },
-                                  itemCount: 5,
-                                  initialRating: f[3] ?? 0.0,
-                                  onRatingUpdate: (val) {},
-                                ),
+                                // trailing: RatingBar(
+                                //   glowColor: Colors.amber,
+                                //   unratedColor: Colors.white,
+                                //   itemBuilder: (context, i) {
+                                //     return Padding(
+                                //       padding: const EdgeInsets.all(8.0),
+                                //       child: Icon(
+                                //         FontAwesomeIcons.drum,
+                                //         color: Colors.amber,
+                                //       ),
+                                //     );
+                                //   },
+                                //   itemCount: 5,
+                                //   initialRating: f[3] ?? 0.0,
+                                //   onRatingUpdate: (val) {},
+                                // ),
                               );
                             }).toList(),
                           );
@@ -624,8 +624,10 @@ class _InfoScreenState extends State<InfoScreen> {
                           Expanded(
                             child: RegField(
                                 label: 'Write Your Review',
-                                onChanged: (val) {
+                                onChanged2: (val) {
                                   review = val;
+                                  print(review);
+                                  
                                 }),
                           ),
                           FlatButton(
@@ -636,6 +638,7 @@ class _InfoScreenState extends State<InfoScreen> {
                             child: Text('Submit'),
                             onPressed: () {
                               setState(() {
+                                print(review);
                                 Database.addReview(widget.info[0], review);
                               });
                             },

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:example_flutter/about.dart';
+import 'package:example_flutter/constants/validation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:example_flutter/database.dart';
@@ -30,25 +31,24 @@ class _UpdateState extends State<UpdateUser> {
     // TODO: implement initState
     super.initState();
     _details = {
-    'Name': User.getName,
-    'Email': User.getEmail,
-    'Password': User.getPass,
-    'Phone': User.getPhone,
-    'DOB': User.getDOB,
-    'Address': User.getAddressDetails,
-    'City': User.getCityID,
-    'Funds': User.getFunds,
-    'Country': User.getCountryID,
-    'Gender': User.getGender,
-    'Image': User.getAvatar
-  };
-    
+      'Name': User.getName,
+      'Email': User.getEmail,
+      'Password': User.getPass,
+      'Phone': User.getPhone,
+      'DOB': User.getDOB,
+      'Address': User.getAddressDetails,
+      'City': User.getCityID,
+      'Funds': User.getFunds,
+      'Country': User.getCountryID,
+      'Gender': User.getGender,
+      'Image': User.getAvatar
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     // final selection = [false, false];
-  print('Pass Value at Update Scrreen: ${User.getPass}');
+    print('Pass Value at Update Scrreen: ${User.getPass}');
     return Scaffold(
       backgroundColor: Colors.black,
       body: Row(
@@ -87,8 +87,8 @@ class _UpdateState extends State<UpdateUser> {
                       //  crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
                         Text('Update Profile Information',
-                            style: TextStyle(
-                                fontFamily: 'Kaushan', fontSize: 35)),
+                            style:
+                                TextStyle(fontFamily: 'Kaushan', fontSize: 35)),
                         SizedBox(
                           height: 50,
                         ),
@@ -97,7 +97,11 @@ class _UpdateState extends State<UpdateUser> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             RegField(
-                              controller: TextEditingController(text: _details['Name']),
+                              validator: (val) {
+                                return validateName(val);
+                              },
+                              controller:
+                                  TextEditingController(text: _details['Name']),
                               onChanged: (val) {
                                 _details['Name'] = val;
                               },
@@ -105,7 +109,12 @@ class _UpdateState extends State<UpdateUser> {
                               icon: Icon(Icons.person, color: Colors.red),
                             ),
                             RegField(
-                              controller: TextEditingController(text:  _details['Email']),
+                              enabled: false,
+                              validator: (val) {
+                                return validateEmail(val);
+                              },
+                              controller: TextEditingController(
+                                  text: _details['Email']),
                               onChanged: (val) {
                                 _details['Email'] = val;
                               },
@@ -116,7 +125,11 @@ class _UpdateState extends State<UpdateUser> {
                               ),
                             ),
                             RegField(
-                              controller: TextEditingController(text: _details['Password']),
+                              validator: (val) {
+                                return validatePassword(val);
+                              },
+                              controller: TextEditingController(
+                                  text: _details['Password']),
                               hideText: true,
                               label: 'Password',
                               icon: Icon(Icons.lock, color: Colors.red),
@@ -130,7 +143,11 @@ class _UpdateState extends State<UpdateUser> {
                               child: SizedBox(
                                 width: 400,
                                 child: DateTimeField(
-                                  controller: TextEditingController(text: _details['DOB']),
+                                  validator: (val) {
+                                    return validateBirthDay(val);
+                                  },
+                                  controller: TextEditingController(
+                                      text: _details['DOB']),
                                   onChanged: (val) {
                                     _details['DOB'] = val.toString();
                                   },
@@ -139,8 +156,7 @@ class _UpdateState extends State<UpdateUser> {
                                         Icon(Icons.cake, color: Colors.red),
                                     labelText: 'Enter your Birthdate',
                                     border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20),
+                                        borderRadius: BorderRadius.circular(20),
                                         borderSide: BorderSide(
                                             color: Colors.red, width: 2)),
                                   ),
@@ -156,14 +172,18 @@ class _UpdateState extends State<UpdateUser> {
                                 ),
                               ),
                             ),
-                            
+
                             // RegField(
                             //   icon: Icon(Icons.lock, color: Colors.red),
                             //   label: 'Confirm Password',
 
                             // ),
                             RegField(
-                              controller: TextEditingController(text:  _details['Phone']),
+                              validator: (val) {
+                                return validatePhone(val);
+                              },
+                              controller: TextEditingController(
+                                  text: _details['Phone']),
                               icon: Icon(
                                 Icons.phone,
                                 color: Colors.red,
@@ -174,7 +194,14 @@ class _UpdateState extends State<UpdateUser> {
                               },
                             ),
                             RegField(
-                              controller: TextEditingController(text:  _details['Address']),
+                              validator: (val) {
+                                if (val.toString().isEmpty)
+                                  return 'Invalid Address';
+                                else
+                                  return null;
+                              },
+                              controller: TextEditingController(
+                                  text: _details['Address']),
                               icon: Icon(
                                 Icons.location_city,
                                 color: Colors.red,
@@ -187,8 +214,7 @@ class _UpdateState extends State<UpdateUser> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Column(
                                       children: <Widget>[
@@ -197,7 +223,8 @@ class _UpdateState extends State<UpdateUser> {
                                               _details['Country']),
                                           builder: (context, snap) {
                                             if (snap.connectionState ==
-                                                ConnectionState.done && snap.hasData) {
+                                                    ConnectionState.done &&
+                                                snap.hasData) {
                                               mysql.Results res = snap.data;
 
                                               return Container(
@@ -212,12 +239,10 @@ class _UpdateState extends State<UpdateUser> {
                                                             f[1].toString()),
                                                         onPressed: () {
                                                           setState(() {
-                                                            _city = f[1]
-                                                                .toString();
-                                                            _details[
-                                                                'City'] = f[
-                                                                    0]
-                                                                .toString();
+                                                            _city =
+                                                                f[1].toString();
+                                                            _details['City'] =
+                                                                f[0].toString();
                                                           });
                                                         },
                                                       );
@@ -227,8 +252,7 @@ class _UpdateState extends State<UpdateUser> {
                                               );
                                             } else
                                               return SpinKitChasingDots(
-                                                duration:
-                                                    Duration(seconds: 2),
+                                                duration: Duration(seconds: 2),
                                                 color: Colors.amber,
                                               );
                                           },
@@ -249,8 +273,7 @@ class _UpdateState extends State<UpdateUser> {
                                               IconButton(
                                                 onPressed: () {
                                                   setState(() {
-                                                    _details['Gender'] =
-                                                        'Male';
+                                                    _details['Gender'] = 'Male';
                                                   });
                                                 },
                                                 icon: Icon(AntDesign.man),
@@ -278,7 +301,8 @@ class _UpdateState extends State<UpdateUser> {
                                       future: Database.readCountries(),
                                       builder: (context, snap) {
                                         if (snap.connectionState ==
-                                            ConnectionState.done && snap.hasData) {
+                                                ConnectionState.done &&
+                                            snap.hasData) {
                                           mysql.Results res = snap.data;
                                           return Container(
                                             decoration: boxDecoration,
@@ -287,8 +311,7 @@ class _UpdateState extends State<UpdateUser> {
                                               title: Text(_country),
                                               children: res.map((f) {
                                                 return FlatButton(
-                                                  child:
-                                                      Text(f[1].toString()),
+                                                  child: Text(f[1].toString()),
                                                   onPressed: () {
                                                     setState(() {
                                                       _city = Database.cityID;
@@ -378,15 +401,18 @@ class _UpdateState extends State<UpdateUser> {
             backgroundColor: Colors.red,
             heroTag: 'f1',
             tooltip: 'Register',
-            child: Icon(Icons.check, color: Colors.white,),
-            onPressed: ()  async{
+            child: Icon(
+              Icons.check,
+              color: Colors.white,
+            ),
+            onPressed: () async {
               // _details.forEach((k,v){
               //   print('$k : $v\n');
               // });
               var results = await Database.updateUser(_details);
-             setState(() {
-               User.setUser = results;
-            });
+              setState(() {
+                User.setUser = results;
+              });
               //TODO: Confirm Dialog
             },
           ),
@@ -398,7 +424,7 @@ class _UpdateState extends State<UpdateUser> {
             tooltip: 'Cancel',
             child: Icon(Icons.arrow_back_ios),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context){
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return AboutMe();
               }));
             },
@@ -410,13 +436,16 @@ class _UpdateState extends State<UpdateUser> {
 }
 
 class RegField extends StatelessWidget {
-  final label, onChanged, icon, hideText, controller;
+  final label, onChanged, icon, hideText, controller, enabled, validator;
   const RegField({
     Key key,
     this.hideText,
     this.label,
     this.onChanged,
-    this.icon, this.controller,
+    this.icon,
+    this.controller,
+    this.enabled,
+    this.validator,
   }) : super(key: key);
 
   @override
@@ -425,13 +454,14 @@ class RegField extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: SizedBox(
         width: 400,
-        child: TextField(
+        child: TextFormField(
+          validator: validator,
           controller: controller ?? TextEditingController(),
           obscureText: hideText ?? false,
           onChanged: onChanged,
           expands: false,
+          enabled: enabled ?? true,
           decoration: InputDecoration(
-            
               suffixIcon: icon,
               labelText: label,
               border: OutlineInputBorder(

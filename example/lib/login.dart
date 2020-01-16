@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:example_flutter/constants/validation.dart';
 import 'package:example_flutter/database.dart';
 import 'package:example_flutter/home.dart';
 import 'package:example_flutter/model/user.dart';
@@ -13,7 +14,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
-
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -25,8 +25,10 @@ class _LoginScreenState extends State<LoginScreen> {
   bool spin = false;
   Timer timer;
   String _email, _password;
-  
+  bool _hide = true;
+
   GlobalKey<FormState> key = GlobalKey<FormState>();
+  
   @override
   void initState() {
     super.initState();
@@ -45,7 +47,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final textStyle = TextStyle(color: Colors.white, fontFamily: "Roboto");
     return Scaffold(
-      floatingActionButton: FloatBack(widget: SplashScreen(),),
+      floatingActionButton: FloatBack(
+        widget: SplashScreen(),
+      ),
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -106,14 +110,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 height: 20,
                               ),
                               CustomTextFIeld(
-                                validator: (String val) {
-                                  if (val.contains('@') &&
-                                      (val.contains('.com') ||
-                                          val.contains('.net') ||
-                                          val.contains('.org')))
-                                    return null;
-                                  else
-                                    return 'Please Enter a valid email';
+                                validator: (email) {
+                                  return validateEmail(email);
                                 },
                                 isPassword: false,
                                 text: 'Enter Email',
@@ -126,12 +124,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 height: 30,
                               ),
                               CustomTextFIeld(
-                                isPassword: true,
+                                isPassword: _hide,
                                 validator: (String val) {
-                                  if (val.length < 6)
-                                    return 'Incomplete Password';
-                                  else
-                                    return null;
+                                  return validatePassword(val);
+                                },
+                                onPressed: () {
+                                  setState(() {
+                                    _hide = !_hide;
+                                  });
                                 },
                                 text: 'Password',
                                 icon: Icons.lock,
@@ -156,9 +156,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.amber,
                                 icon: Icons.lock_open,
                                 onPressed: () async {
-                                  
                                   if (key.currentState.validate()) {
-                                   key.currentState.save();
+                                    key.currentState.save();
 
                                     var result;
                                     try {
@@ -181,18 +180,27 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   child: Text(isUser
                                                       ? "OK"
                                                       : "Try Again"),
-                                                  onPressed: () {
+                                                  onPressed: () async {
                                                     Navigator.pop(context);
-                                                    if (isUser)
-                                                      Navigator.push(context,
+                                                    if (isUser) {
+                                                      User.setUser = result;
+                                                      print('Writing to Log');
+                                                      await Database.writeLogs(
+                                                          1,
+                                                          DateTime.now()
+                                                              .toString());
+
+                                                      await Navigator.push(
+                                                          context,
                                                           MaterialPageRoute(
                                                               builder:
                                                                   (context) {
                                                         timer.cancel();
-                                                        User.setUser = result;
+
                                                         //key.currentState.dispose();
                                                         return Home();
                                                       }));
+                                                    }
                                                   },
                                                 )
                                               ],
@@ -322,7 +330,8 @@ class CustomButton extends StatelessWidget {
 }
 
 class CustomTextFIeld extends StatelessWidget {
-  final icon, text, onChanged, suffixIcon, isPassword;
+  final icon, text, onChanged, suffixIcon, isPassword, onPressed;
+
   final Function validator;
 
   const CustomTextFIeld({
@@ -333,39 +342,38 @@ class CustomTextFIeld extends StatelessWidget {
     this.suffixIcon,
     this.isPassword,
     this.validator,
+    this.onPressed,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var showPW = false;
     return Container(
       width: 400,
       child: TextFormField(
-          obscureText: showPW,
+          style: TextStyle(color: Colors.black),
+          obscureText: isPassword ?? false,
           onSaved: onChanged,
           validator: validator,
+          cursorColor: Colors.black,
           decoration: InputDecoration(
-            hintText: text,
-            hintStyle: TextStyle(color: Colors.black),
-            filled: true,
-            fillColor: Colors.white60,
-            border: OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFF202729)),
-                borderRadius: BorderRadius.circular(20)),
-            //enabledBorder: InputBorder.none,
-            prefixIcon: Icon(
-              icon,
-              color: Colors.black,
-            ),
-            suffixIcon: isPassword
-                ? IconButton(
-                    icon: Icon(FontAwesomeIcons.eye),
-                    onPressed: () {
-                      showPW = !showPW;
-                    },
-                  )
-                : null,
-          )),
+              hintText: text,
+              hintStyle: TextStyle(color: Colors.black),
+              filled: true,
+              fillColor: Colors.white60,
+              border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFF202729)),
+                  borderRadius: BorderRadius.circular(20)),
+              //enabledBorder: InputBorder.none,
+              prefixIcon: Icon(
+                icon,
+                color: Colors.black,
+              ),
+              suffixIcon: !isPassword
+                  ? null
+                  : IconButton(
+                      icon: Icon(FontAwesomeIcons.eye),
+                      onPressed: onPressed,
+                    ))),
     );
   }
 }

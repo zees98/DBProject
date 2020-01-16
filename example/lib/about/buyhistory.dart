@@ -1,3 +1,4 @@
+import 'package:example_flutter/about.dart';
 import 'package:example_flutter/constants/misc.dart';
 import 'package:example_flutter/database.dart';
 import 'package:example_flutter/home.dart';
@@ -51,7 +52,23 @@ class PurchaseHistoryState extends State<PurchaseHistory> {
                       )
                     ],
                   ),
-                  CartButton()
+                  Row(
+                    children: <Widget>[
+                      CartButton(),
+                      FloatingActionButton(
+                        backgroundColor: Colors.deepPurple,
+                        hoverColor: Colors.red,
+                        child: Icon(MaterialIcons.keyboard_backspace),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (context){
+                              return AboutMe();
+                            }
+                          ));
+                        },
+                      )
+                    ],
+                  )
                 ],
               ),
               Divider(

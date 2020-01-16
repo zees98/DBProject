@@ -1,18 +1,22 @@
 import 'package:example_flutter/constants/misc.dart';
 import 'package:example_flutter/database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mysql1/mysql1.dart' as mysql;
 
-class FavouriteScreen extends StatefulWidget {
+class ActivityScreen extends StatefulWidget {
   @override
-  _FavouriteScreenState createState() => _FavouriteScreenState();
+  _ActivityScreenState createState() => _ActivityScreenState();
 }
 
-class _FavouriteScreenState extends State<FavouriteScreen> {
-  double end = 1.0;
+class _ActivityScreenState extends State<ActivityScreen> {
+  Map<String, String> image = {
+    'Login' : 'login.png',
+    'Purchase' : 'consumer.png',
+    'Fund Added' : 'fund.png',
+    'Profile Update': 'refresh.png',
+    'Account Register' : 'clipboard.png',
+  };
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -22,7 +26,8 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
         color: Colors.black,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),
-            side: BorderSide(color: Colors.red, width: 6)),
+            side: BorderSide.lerp(BorderSide(color: Colors.red, width: 6),
+                BorderSide(color: Colors.white, width: 6), 2.0)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: ListView(
@@ -31,7 +36,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    'Favourites',
+                    'Activity',
                     style: title.copyWith(fontSize: 60),
                   ),
                   SizedBox(
@@ -39,13 +44,12 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                   ),
                   TweenAnimationBuilder(
                     duration: Duration(milliseconds: 600),
-                    tween: Tween(begin: 0.5, end: end),
+                    tween: Tween(begin: 0.5, end: 1.0),
                     curve: Curves.bounceInOut,
                     builder: (context, val, widget) {
-                      return Icon(
-                        FontAwesome.heart,
-                        size: 80 * val,
-                        color: Colors.red.withRed((255 * val).toInt()),
+                      return Image.asset(
+                        'assets/icon/checklist.png',
+                        height: 80 * val,
                       );
                     },
                   ),
@@ -57,7 +61,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                 color: Colors.white,
               ),
               FutureBuilder(
-                future: Database.getFavourites('guitar'),
+                future: Database.readLogs(),
                 builder: (context, snap) {
                   if (snap.connectionState == ConnectionState.done &&
                       snap.hasData) {
@@ -68,49 +72,48 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                       horizontalMargin: 20,
                       columns: [
                         'ID',
-                        'Image',
                         'Name',
-                        'Manufacturer',
-                        'Price',
-                        'Rating',
-                        ''
+                        'Description',
+                        'Date',
                       ].map((f) {
-                        return DataColumn(label: Text(f));
+                        return DataColumn(
+                            label: Text(
+                          f,
+                        ));
                       }).toList(),
                       rows: res.map((f) {
                         return DataRow(cells: [
-                          DataCell(Text('${f[0]}')),
-                          DataCell(Image.asset(
-                            'assets/${f[4]}',
-                            width: 150,
+                          DataCell(Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Text('${f[0]}'),
+                              Image.asset(
+                                'assets/id-card.png',
+                                height: 50,
+                              )
+                            ],
                           )),
-                          DataCell(Text('${f[1]} ${f[2]}')),
-                          DataCell(Text('${f[7]}')),
-                          DataCell(Text('${f[3]}')),
-                          DataCell(RatingBar(
-                            onRatingUpdate: (val) {},
-                            itemCount: 5,
-                            initialRating: f[8] ?? 0.0,
-                            itemBuilder: (context, i) {
-                              return Icon(FontAwesome5Solid.microphone,
-                                  size: 20, color: Colors.red);
-                            },
+                          DataCell(Row(
+                           // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              Text('${f[1]}'),
+                              SizedBox(width: 20,),
+                              Image.asset(
+                                'assets/${image[f[1].toString()]}',
+                                height: 50,
+                              )
+                            ],
                           )),
-                          DataCell(FlatButton(
-                            onPressed: (){
-                              setState(() {
-                                Database.removeFavourite(f[0]);
-                              });
-                              setState(() {
-                                
-                              });
-                            },
-
-                            child: Icon(MaterialIcons.delete_forever),
-                            shape: CircleBorder(
-                                side:
-                                    BorderSide(color: Colors.white, width: 2)),
-                          ))
+                          DataCell(Text('${f[2]}')),
+                          DataCell(Row(
+                            children: <Widget>[
+                              Container(
+                                width: 200,
+                                child: Text('${f[3].toString().substring(0,19)}')),
+                              SizedBox(width: 20,),
+                               Image.asset('assets/timetable.png', height: 50, color: Colors.white,)
+                            ],
+                          )),
                         ]);
                       }).toList(),
                     );

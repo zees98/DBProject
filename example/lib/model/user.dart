@@ -4,7 +4,7 @@ import 'package:mysql1/mysql1.dart' as mysql;
 class User {
   static var _user;
   static List<mysql.Row> cart = [];
-
+ static int purchases;
   static set setUser(mysql.Results user) {
     _user = user.first;
   }
@@ -12,7 +12,12 @@ class User {
   static mysql.Row get getUser {
     return _user;
   }
-
+  static set setPurchaseCount(int num){
+    purchases = num;
+  }
+  static int get getPurchaseCount {
+    return purchases;
+  }
   static String get getID {
     return _user[0].toString(); 
   }

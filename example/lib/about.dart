@@ -1,9 +1,15 @@
 import 'dart:io';
+import 'package:example_flutter/about/activity.dart';
 import 'package:example_flutter/about/buyhistory.dart';
 import 'package:example_flutter/about/favourite.dart';
 import 'package:example_flutter/about/funds.dart';
+import 'package:example_flutter/constants/messageType.dart';
+import 'package:example_flutter/database.dart';
 import 'package:example_flutter/home.dart';
+import 'package:example_flutter/login.dart';
 import 'package:example_flutter/updateUser.dart';
+import 'package:example_flutter/widgets/alertbox.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'model/user.dart';
 import 'package:flutter/material.dart';
@@ -88,9 +94,14 @@ class _AboutMeState extends State<AboutMe> {
                           value: '\$${User.getFunds}',
                           icon: 'payment.png',
                         ),
-                        InfoCards(
+                        FutureBuilder(
+                          future: Database.purchseCount(),
+                          builder: (context, snap){
+                            if(snap.connectionState == ConnectionState.done){
+                              return InfoCards(
                           onPressed: () {
                             showDialog(
+                                barrierDismissible: false,
                                 context: context,
                                 builder: (context) {
                                   return PurchaseHistory();
@@ -98,8 +109,13 @@ class _AboutMeState extends State<AboutMe> {
                           },
                           color: Colors.amber.shade800,
                           text: 'Purchases',
-                          value: '8',
+                          value: '${User.getPurchaseCount}',
                           icon: 'shopping-basket.png',
+                        );
+                            }
+                            else 
+                              return SpinKitHourGlass(color: Colors.amber,);
+                          },
                         ),
                         InfoCards(
                           onPressed: () {
@@ -115,12 +131,35 @@ class _AboutMeState extends State<AboutMe> {
                           icon: 'rating.png',
                         ),
                         InfoCards(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return ActivityScreen();
+                                });
+                          },
                           color: Colors.primaries[8],
                           text: 'Activity',
                           value: 'Log',
                           icon: 'checklist.png',
                         ),
                         InfoCards(
+                          onPressed: () {
+                            setState(() {
+                              Database.deleteUser();
+                            });
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertBox(
+                                    message: 'Your account has been delete',
+                                    type: MessageType.Info,
+                                  );
+                                });
+                          Navigator.push(context, MaterialPageRoute(builder: (context){
+                            return LoginScreen();
+                          }));    
+                          },
                           value: 'Account',
                           text: 'Delete',
                           icon: 'delete-user.png',

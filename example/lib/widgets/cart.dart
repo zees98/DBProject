@@ -216,9 +216,12 @@ class CartViewState extends State<CartView>
                                           context: context,
                                           builder: (context) {
                                             print(User.cartTotal);
-                                            if (double.parse(User.getFunds) <
+                                            if(User.cartTotal == 0.0){
+                                              return AlertBox(message: 'Add Items to the cart', type: MessageType.Info,);
+                                            }
+                                            else if (double.parse(User.getFunds) <
                                                 User.cartTotal +
-                                                    User.cartTotal * 0.1)
+                                                    User.cartTotal * 0.1 )
                                               return AlertBox(
                                                 message: 'Insufficient Balance',
                                                 type: MessageType.Fail,
@@ -232,7 +235,7 @@ class CartViewState extends State<CartView>
                                             }
                                           });
                                       if (User.cartTotal <=
-                                          double.parse(User.getFunds)) {
+                                          double.parse(User.getFunds) && User.cartTotal != 0.0) {
                                         var results;
                                         results = await Database.addtoPurchase(
                                             User.cartTotal +

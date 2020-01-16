@@ -599,7 +599,7 @@ class _HomeState extends State<Home> {
                                           MainAxisAlignment.spaceBetween,
                                       //mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
-                                        Text(f[0].toString()),
+                                        Text(f[1].toString()),
                                         Material(
                                             shape: CircleBorder(
                                                 side: BorderSide(
@@ -607,7 +607,7 @@ class _HomeState extends State<Home> {
                                             child: Padding(
                                               padding:
                                                   const EdgeInsets.all(8.0),
-                                              child: Text(f[1].toString()),
+                                              child: Text(f[2].toString()),
                                             ))
                                       ],
                                     ),
